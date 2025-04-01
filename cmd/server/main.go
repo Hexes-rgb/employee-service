@@ -1,69 +1,43 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/Hexes-rgb/employee-service/internal/config"
+	"github.com/Hexes-rgb/employee-service/internal/repository/postgres"
+	"github.com/Hexes-rgb/employee-service/internal/server"
+	"github.com/Hexes-rgb/employee-service/internal/service"
+	"github.com/Hexes-rgb/employee-service/internal/transport/rest"
 )
 
 func main() {
-	// Инициализация БД
+	logger := log.New(os.Stdout, "EMPLOYEE-SERVICE: ", log.LstdFlags|log.Lshortfile)
 
-	// Проверка соединения с БД
+	cfg := config.Load()
 
-	// Инициализация WorkerPool
-
-	// Инициализация репозиториев
-
-	// Инициализация сервисов
-
-	// Установка сервисов в WorkerPool
-
-	// Запуск WorkerPool
-
-	// Настройка роутера
-
-	// Настройка сервера
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	db, err := config.InitDB(cfg.Database, logger)
+	if err != nil {
+		logger.Fatalf("Database initialization failed: %v", err)
 	}
-
-	server := &http.Server{
-		Addr: ":" + port,
-	}
-
-	// Канал для graceful shutdown
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	// Запуск сервера в горутине
-	go func() {
-		log.Printf("Server starting on :%s", port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.Printf("Error closing database connection: %v", err)
 		}
 	}()
 
-	// Ожидание сигнала завершения
-	<-done
-	log.Println("Shutting down server...")
+	empRepo := postgres.NewEmployeeRepo(db)
+	deptRepo := postgres.NewDepartmentRepo(db)
 
-	// Graceful shutdown
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer shutdownCancel()
+	empService := service.NewEmployeeService(empRepo, deptRepo)
+	deptService := service.NewDepartmentService(deptRepo)
 
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("Server shutdown failed: %v", err)
+	router := rest.NewRouter(empService, deptService)
+
+	srv := server.New(cfg.Server, router, logger)
+	if err := srv.Run(); err != nil {
+		logger.Fatal(err)
 	}
 
-	// Остановка WorkerPool
-
-	log.Println("Server stopped gracefully")
+	srv.WaitForShutdown()
 }

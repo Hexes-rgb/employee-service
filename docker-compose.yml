@@ -2,21 +2,22 @@ version: '3.8'
 
 services:
   employee-service-api:
-    build: .
-    ports:
-      - "${APP_PORT}:8080"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-    depends_on:
-      employee-service-db:
-        condition: service_healthy
+    container_name: employee-service-api
+    image: golang:1.22.0-alpine
     restart: unless-stopped
+    ports:
+      - ${APP_PORT}:8080
+    networks:
+      - employee-network 
+    volumes:
+      - ./:/go/app
+    depends_on:
+      - employee-service-db
+    working_dir: /go/app/cmd/server
+    command: go run main.go
 
   employee-service-db:
+    container_name: employee-service-db
     image: postgres:15-alpine
     environment:
       - POSTGRES_USER=${DB_USER}
@@ -25,13 +26,14 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - employee-service-db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    networks:
+      - employee-network  
 
 volumes:
-  employee-service-db_data:
+  db_data:
+
+networks:
+  employee-network:
+    driver: bridge

@@ -1,4 +1,4 @@
-.PHONY: build up down clear test migrate-up migrate-down
+.PHONY: build up down restart clear test migrate-up migrate-down
 
 build:
 	docker-compose build
@@ -7,7 +7,11 @@ up:
 	docker-compose up -d
 
 down:
-	docker-compose down -v --remove-orphans
+	docker-compose down
+
+restart:
+	docker-compose down	
+	docker-compose up -d
 
 clear:
 	docker-compose down -v --remove-orphans
