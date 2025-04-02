@@ -84,7 +84,10 @@ paths:
               surname: "Иванов"
               phone: "+123456789"
               companyId: 1
-              departmentId: 2
+              department:
+                companyId: 1
+                name: "Engineering"
+                phone: "+123456789"
               passportType: "Паспорт РФ"
               passportNumber: "1234567890"
       responses:
@@ -159,7 +162,10 @@ paths:
               surname: "Иванов"
               phone: "+123456789"
               companyId: 1
-              departmentId: 2
+              department:
+                companyId: 1
+                name: "Engineering"
+                phone: "+123456789"
               passportType: "Паспорт РФ"
               passportNumber: "1234567890"
       responses:
@@ -311,9 +317,6 @@ components:
           type: string
         companyId:
           type: integer
-        departmentId:
-          type: integer
-          nullable: true
         passportType:
           type: string
         passportNumber:

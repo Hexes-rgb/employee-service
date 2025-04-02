@@ -51,13 +51,17 @@ make test # Запуск тестов.
   - **Тело запроса:** 
     ```json
     {
-      "name": "Иван",
-      "surname": "Иванов",
-      "phone": "+123456789",
+      "name": "John",
+      "surname": "Dumper",
+      "phone": "+79991261122",
       "companyId": 1,
-      "departmentId": 2,
-      "passportType": "Паспорт РФ",
-      "passportNumber": "1234567890"
+      "department": {
+          "companyId": 6,
+          "name": "Dev",
+          "phone": "+799953367343"
+      },
+      "passportType": "id",
+      "passportNumber": "1341321"
     }
     ```
   - **Ответы:**

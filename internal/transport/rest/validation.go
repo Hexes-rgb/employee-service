@@ -7,6 +7,9 @@ import (
 )
 
 func validateDepartment(dept *domain.Department) error {
+	if dept == nil {
+		return errors.New("department is required")
+	}
 	if dept.CompanyID == 0 {
 		return errors.New("department companyId is required")
 	}
