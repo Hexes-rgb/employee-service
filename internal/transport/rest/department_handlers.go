@@ -29,7 +29,7 @@ func (h *DepartmentHandlers) GetOrCreateDepartment(w http.ResponseWriter, r *htt
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]int{"id": id})
+	respondWithJSON(w, http.StatusOK, IDResponse{ID: id})
 }
 
 func (h *DepartmentHandlers) GetDepartment(w http.ResponseWriter, r *http.Request) {

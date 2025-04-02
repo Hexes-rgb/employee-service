@@ -77,7 +77,7 @@ func (r *EmployeeRepo) GetByID(id int) (*domain.Employee, error) {
 
 func (r *EmployeeRepo) Update(emp *domain.Employee) error {
 	query := `UPDATE employees SET 
-        name = $1, surname = $2, phone = $3, company_id = $4, 
+        name = $1, surname = $2, phone = $3, company_id = COALESCE(NULLIF($4, 0), company_id), 
         department_id = $5, passport_type = $6, passport_number = $7
         WHERE id = $8`
 

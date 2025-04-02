@@ -12,6 +12,14 @@ type EmployeeHandlers struct {
 	service EmployeeService
 }
 
+type IDResponse struct {
+	ID int `json:"id"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message"`
+}
+
 func NewEmployeeHandlers(s EmployeeService) *EmployeeHandlers {
 	return &EmployeeHandlers{service: s}
 }
@@ -29,7 +37,7 @@ func (h *EmployeeHandlers) CreateEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, map[string]int{"id": id})
+	respondWithJSON(w, http.StatusCreated, IDResponse{ID: id})
 }
 
 func (h *EmployeeHandlers) GetEmployee(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +75,7 @@ func (h *EmployeeHandlers) UpdateEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"message": "Employee updated successfully"})
+	respondWithJSON(w, http.StatusOK, MessageResponse{Message: "Employee updated successfully"})
 }
 
 func (h *EmployeeHandlers) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +90,7 @@ func (h *EmployeeHandlers) DeleteEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"message": "Employee deleted successfully"})
+	respondWithJSON(w, http.StatusOK, MessageResponse{Message: "Employee deleted successfully"})
 }
 
 func (h *EmployeeHandlers) GetCompanyEmployees(w http.ResponseWriter, r *http.Request) {
