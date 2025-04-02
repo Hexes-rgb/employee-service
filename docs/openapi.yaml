@@ -1,0 +1,341 @@
+openapi: 3.0.0
+info:
+  title: Employee Service API
+  description: API для управления сотрудниками и департаментами в сервисе сотрудников
+  version: 1.0.0
+paths:
+  /department:
+    post:
+      summary: Получить или создать департамент
+      description: Возвращает департамент, если он существует, или создает новый.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+            example:
+              companyId: 1
+              name: "Engineering"
+              phone: "+123456789"
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDResponse'
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /department/{id}:
+    get:
+      summary: Получить департамент по ID
+      description: Возвращает информацию о департаменте по его ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID департамента
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          description: Неверный ID департамента
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Департамент не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employee:
+    post:
+      summary: Создать сотрудника
+      description: Создает нового сотрудника в системе.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+            example:
+              name: "Иван"
+              surname: "Иванов"
+              phone: "+123456789"
+              companyId: 1
+              departmentId: 2
+              passportType: "Паспорт РФ"
+              passportNumber: "1234567890"
+      responses:
+        '201':
+          description: Успешное создание
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDResponse'
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employee/{id}:
+    get:
+      summary: Получить данные сотрудника
+      description: Возвращает информацию о сотруднике по его ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сотрудника
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: Неверный ID сотрудника
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Сотрудник не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Обновить данные сотрудника
+      description: Обновляет информацию о сотруднике по его ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сотрудника
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+            example:
+              name: "Иван"
+              surname: "Иванов"
+              phone: "+123456789"
+              companyId: 1
+              departmentId: 2
+              passportType: "Паспорт РФ"
+              passportNumber: "1234567890"
+      responses:
+        '200':
+          description: Успешное обновление
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Удалить сотрудника
+      description: Удаляет сотрудника по его ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сотрудника
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешное удаление
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Неверный ID сотрудника
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /company/{companyId}/employees:
+    get:
+      summary: Получить сотрудников компании
+      description: Возвращает список сотрудников, работающих в компании с указанным ID.
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          description: ID компании
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '400':
+          description: Неверный ID компании
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /company/{companyId}/department/{departmentId}/employees:
+    get:
+      summary: Получить сотрудников департамента
+      description: Возвращает список сотрудников, работающих в департаменте компании.
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          description: ID компании
+          schema:
+            type: integer
+        - name: departmentId
+          in: path
+          required: true
+          description: ID департамента
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '400':
+          description: Неверный ID компании или департамента
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+        companyId:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: string
+        companyId:
+          type: integer
+        departmentId:
+          type: integer
+          nullable: true
+        passportType:
+          type: string
+        passportNumber:
+          type: string
+        department:
+          $ref: '#/components/schemas/Department'
+          nullable: true
+
+    IDResponse:
+      type: object
+      properties:
+        ID:
+          type: integer
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string

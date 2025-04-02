@@ -39,8 +39,8 @@ func (r *DepartmentRepo) GetOrCreate(dept *domain.Department) (int, error) {
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Constraint {
-			case "departments_company_id_name_key":
-				return 0, fmt.Errorf("department with this name already exists in this company")
+			// case "departments_company_id_name_key":
+			// 	return 0, fmt.Errorf("department with this name already exists in this company")
 			case "departments_phone_key":
 				return 0, fmt.Errorf("department with this phone number already exists")
 			}
