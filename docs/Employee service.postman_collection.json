@@ -64,7 +64,7 @@
 		{
 			"name": "Update employee",
 			"request": {
-				"method": "PUT",
+				"method": "PATCH",
 				"header": [],
 				"body": {
 					"mode": "raw",

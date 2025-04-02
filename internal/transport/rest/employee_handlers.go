@@ -31,6 +31,16 @@ func (h *EmployeeHandlers) CreateEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	if err := validateEmployee(&emp); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload: "+err.Error())
+		return
+	}
+
+	if err := validateDepartment(emp.Department); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload: "+err.Error())
+		return
+	}
+
 	id, err := h.service.CreateEmployee(&emp)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -69,6 +79,11 @@ func (h *EmployeeHandlers) UpdateEmployee(w http.ResponseWriter, r *http.Request
 		return
 	}
 	emp.ID = id
+
+	if err := validateDepartment(emp.Department); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload: "+err.Error())
+		return
+	}
 
 	if err := h.service.UpdateEmployee(&emp); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())

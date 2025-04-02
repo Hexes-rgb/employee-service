@@ -23,6 +23,11 @@ func (h *DepartmentHandlers) GetOrCreateDepartment(w http.ResponseWriter, r *htt
 		return
 	}
 
+	if err := validateDepartment(&dept); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload: "+err.Error())
+		return
+	}
+
 	id, err := h.service.GetOrCreate(&dept)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())

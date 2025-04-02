@@ -3,6 +3,8 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/Hexes-rgb/employee-service/internal/domain"
 	"github.com/lib/pq"
@@ -76,22 +78,55 @@ func (r *EmployeeRepo) GetByID(id int) (*domain.Employee, error) {
 }
 
 func (r *EmployeeRepo) Update(emp *domain.Employee) error {
-	query := `UPDATE employees SET 
-        name = $1, surname = $2, phone = $3, company_id = COALESCE(NULLIF($4, 0), company_id), 
-        department_id = $5, passport_type = $6, passport_number = $7
-        WHERE id = $8`
+	var updates []string
+	var args []interface{}
+	argID := 1
 
-	result, err := r.db.Exec(query,
-		emp.Name,
-		emp.Surname,
-		emp.Phone,
-		emp.CompanyID,
-		emp.DepartmentID,
-		emp.PassportType,
-		emp.PassportNumber,
-		emp.ID,
-	)
+	if emp.Name != "" {
+		updates = append(updates, "name = $"+strconv.Itoa(argID))
+		args = append(args, emp.Name)
+		argID++
+	}
+	if emp.Surname != "" {
+		updates = append(updates, "surname = $"+strconv.Itoa(argID))
+		args = append(args, emp.Surname)
+		argID++
+	}
+	if emp.Phone != "" {
+		updates = append(updates, "phone = $"+strconv.Itoa(argID))
+		args = append(args, emp.Phone)
+		argID++
+	}
+	if emp.CompanyID != 0 {
+		updates = append(updates, "company_id = $"+strconv.Itoa(argID))
+		args = append(args, emp.CompanyID)
+		argID++
+	}
+	if emp.DepartmentID != nil {
+		updates = append(updates, "department_id = $"+strconv.Itoa(argID))
+		args = append(args, emp.DepartmentID)
+		argID++
+	}
+	if emp.PassportType != "" {
+		updates = append(updates, "passport_type = $"+strconv.Itoa(argID))
+		args = append(args, emp.PassportType)
+		argID++
+	}
+	if emp.PassportNumber != "" {
+		updates = append(updates, "passport_number = $"+strconv.Itoa(argID))
+		args = append(args, emp.PassportNumber)
+		argID++
+	}
 
+	args = append(args, emp.ID)
+
+	if len(updates) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := "UPDATE employees SET " + strings.Join(updates, ", ") + " WHERE id = $" + strconv.Itoa(argID)
+
+	result, err := r.db.Exec(query, args...)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Constraint {
@@ -101,7 +136,7 @@ func (r *EmployeeRepo) Update(emp *domain.Employee) error {
 				return fmt.Errorf("employee with this passport number already exists")
 			}
 		}
-		return fmt.Errorf("failed to create employee: %w", err)
+		return fmt.Errorf("failed to update employee: %w", err)
 	}
 
 	rowsAffected, err := result.RowsAffected()

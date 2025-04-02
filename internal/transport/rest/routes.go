@@ -13,7 +13,7 @@ func NewRouter(
 	// Employee routes
 	router.HandleFunc("POST /employees", empHandlers.CreateEmployee)
 	router.HandleFunc("GET /employees/{id}", empHandlers.GetEmployee)
-	router.HandleFunc("PUT /employees/{id}", empHandlers.UpdateEmployee)
+	router.HandleFunc("PATCH /employees/{id}", empHandlers.UpdateEmployee)
 	router.HandleFunc("DELETE /employees/{id}", empHandlers.DeleteEmployee)
 	router.HandleFunc("GET /companies/{companyId}/employees", empHandlers.GetCompanyEmployees)
 	router.HandleFunc("GET /companies/{companyId}/departments/{departmentId}/employees", empHandlers.GetDepartmentEmployees)
